@@ -26,9 +26,7 @@ import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
-/**
- * Runs GraalVM's native-image command with configured options and parameters.
- */
+/** Runs GraalVM's native-image command with configured options and parameters. */
 public class NativeImageTask extends BaseGraalCompileTask {
 
     private final Property<String> mainClass = getProject().getObjects().property(String.class);
@@ -43,8 +41,8 @@ public class NativeImageTask extends BaseGraalCompileTask {
     /**
      * Returns a platform-dependent file extension for executables.
      *
-     * @return an empty String on {@link Platform.OperatingSystem#MAC MAC} and
-     *         {@link Platform.OperatingSystem#LINUX LINUX}, ".exe" on {@link Platform.OperatingSystem#WINDOWS WINDOWS}
+     * @return an empty String on {@link Platform.OperatingSystem#MAC MAC} and {@link Platform.OperatingSystem#LINUX
+     *     LINUX}, ".exe" on {@link Platform.OperatingSystem#WINDOWS WINDOWS}
      */
     @Override
     protected String getArchitectureSpecifiedOutputExtension() {
@@ -83,9 +81,11 @@ public class NativeImageTask extends BaseGraalCompileTask {
     private final class LogAction implements Action<Task> {
         @Override
         public void execute(Task _task) {
-            getLogger().warn("native image available at {} ({} MB)",
-                    getProject().relativePath(getOutputFile().get().getAsFile()),
-                    fileSizeMegabytes(getOutputFile().get()));
+            getLogger()
+                    .warn(
+                            "native image available at {} ({} MB)",
+                            getProject().relativePath(getOutputFile().get().getAsFile()),
+                            fileSizeMegabytes(getOutputFile().get()));
         }
     }
 }

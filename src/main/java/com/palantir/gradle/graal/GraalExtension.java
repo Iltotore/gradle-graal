@@ -54,7 +54,7 @@ public class GraalExtension {
     /**
      * Returns the base URL to use for downloading GraalVM binaries.
      *
-     * <p>Defaults to {@link #DEFAULT_DOWNLOAD_BASE_URL}.</p>
+     * <p>Defaults to {@link #DEFAULT_DOWNLOAD_BASE_URL}.
      */
     public final Provider<String> getDownloadBaseUrl() {
         return downloadBaseUrl;
@@ -76,7 +76,7 @@ public class GraalExtension {
     /**
      * Returns the outputName to use for the generated executable file.
      *
-     * <p>Check {@link org.gradle.api.provider.Provider#isPresent()} to determine if an override has been set.</p>
+     * <p>Check {@link org.gradle.api.provider.Provider#isPresent()} to determine if an override has been set.
      */
     public final Provider<String> getOutputName() {
         return outputName;
@@ -89,25 +89,21 @@ public class GraalExtension {
     /**
      * Returns the graalVersion of GraalVM to use.
      *
-     * <p>Defaults to {@link #DEFAULT_GRAAL_VERSION}</p>
+     * <p>Defaults to {@link #DEFAULT_GRAAL_VERSION}
      */
     public final Provider<String> getGraalVersion() {
         return graalVersion;
     }
 
-
     public final Provider<List<String>> getOptions() {
         return this.options;
     }
 
-    /**
-     * Add option from https://github.com/oracle/graal/blob/master/substratevm/OPTIONS.md.
-     */
+    /** Add option from https://github.com/oracle/graal/blob/master/substratevm/OPTIONS.md. */
     public final void option(String option) {
         if (option.trim().startsWith("-H:Name=")) {
             throw new GradleException("Use 'outputName' instead of '" + option + "'");
         }
         this.options.add(option);
     }
-
 }

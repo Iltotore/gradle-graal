@@ -37,9 +37,7 @@ import org.gradle.api.tasks.TaskAction;
 
 /** Extracts GraalVM tooling from downloaded tgz archive using the system's tar command. */
 public class ExtractGraalTask extends DefaultTask {
-    /**
-     * These binaries get .cmd as their filename extension, instead of .cmd (on Windows).
-     */
+    /** These binaries get .cmd as their filename extension, instead of .cmd (on Windows). */
     private static final Set<String> WINDOWS_CMD_BINARIES =
             new HashSet<>(Arrays.asList("native-image", "native-image-configure", "polyglot"));
 
@@ -54,11 +52,12 @@ public class ExtractGraalTask extends DefaultTask {
                 + " copy method.");
 
         onlyIf(task -> !getOutputDirectory().get().getAsFile().exists());
-        outputDirectory.set(graalVersion.map(v ->
-                getProject().getLayout().getProjectDirectory()
-                        .dir(cacheDir.get().toFile().getAbsolutePath())
-                        .dir(v)
-                        .dir("graalvm-ce-" + v)));
+        outputDirectory.set(graalVersion.map(v -> getProject()
+                .getLayout()
+                .getProjectDirectory()
+                .dir(cacheDir.get().toFile().getAbsolutePath())
+                .dir(v)
+                .dir("graalvm-ce-" + v)));
     }
 
     @TaskAction
@@ -119,7 +118,8 @@ public class ExtractGraalTask extends DefaultTask {
 
     private Path getArchitectureSpecifiedBinaryPath(String binaryName) {
         switch (Platform.operatingSystem()) {
-            case MAC: return Paths.get("Contents", "Home", "bin", binaryName);
+            case MAC:
+                return Paths.get("Contents", "Home", "bin", binaryName);
             case LINUX:
             case WINDOWS:
                 return Paths.get("bin", binaryName);

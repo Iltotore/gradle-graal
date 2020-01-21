@@ -28,12 +28,13 @@ import org.gradle.jvm.tasks.Jar;
 /**
  * Adds tasks to download, extract and interact with GraalVM tooling.
  *
- * <p>All tooling execution (e.g. nativeImage) will cause GraalVM tooling to download and cache if not already
- * present. Currently, GraalVM CE only supports MacOS and Linux, and, as a result, this plugin will only correctly
- * function on MacOS and Linux. The plugin will automatically select the correct architecture and error clearly
- * if the runtime architecture is not supported.</p>
+ * <p>All tooling execution (e.g. nativeImage) will cause GraalVM tooling to download and cache if not already present.
+ * Currently, GraalVM CE only supports MacOS and Linux, and, as a result, this plugin will only correctly function on
+ * MacOS and Linux. The plugin will automatically select the correct architecture and error clearly if the runtime
+ * architecture is not supported.
  *
- * <p>Downloads are stored in ~/.gradle/caches/com.palantir.graal using the following structure:</p>
+ * <p>Downloads are stored in ~/.gradle/caches/com.palantir.graal using the following structure:
+ *
  * <pre>
  * ~/.gradle/caches/com.palantir.graal/
  * └── [version]/
@@ -53,23 +54,21 @@ public class GradleGraalPlugin implements Plugin<Project> {
 
         Path cacheDir = Optional.ofNullable((String) project.findProperty("com.palantir.graal.cache.dir"))
                 .map(Paths::get)
-                .orElseGet(() -> project.getGradle().getGradleUserHomeDir().toPath()
+                .orElseGet(() -> project.getGradle()
+                        .getGradleUserHomeDir()
+                        .toPath()
                         .resolve("caches")
                         .resolve("com.palantir.graal"));
 
-        TaskProvider<DownloadGraalTask> downloadGraal = project.getTasks().register(
-                "downloadGraalTooling",
-                DownloadGraalTask.class,
-                task -> {
+        TaskProvider<DownloadGraalTask> downloadGraal = project.getTasks()
+                .register("downloadGraalTooling", DownloadGraalTask.class, task -> {
                     task.setGraalVersion(extension.getGraalVersion());
                     task.setDownloadBaseUrl(extension.getDownloadBaseUrl());
                     task.setCacheDir(cacheDir);
                 });
 
-        TaskProvider<ExtractGraalTask> extractGraal = project.getTasks().register(
-                "extractGraalTooling",
-                ExtractGraalTask.class,
-                task -> {
+        TaskProvider<ExtractGraalTask> extractGraal = project.getTasks()
+                .register("extractGraalTooling", ExtractGraalTask.class, task -> {
                     task.setGraalVersion(extension.getGraalVersion());
                     task.setInputArchive(downloadGraal.get().getArchive());
                     task.setCacheDir(cacheDir);
@@ -77,34 +76,28 @@ public class GradleGraalPlugin implements Plugin<Project> {
                 });
 
         TaskProvider<Jar> jar = project.getTasks().withType(Jar.class).named("jar");
-        project.getTasks().register(
-                "nativeImage",
-                NativeImageTask.class,
-                task -> {
-                    task.setMainClass(extension.getMainClass());
-                    task.setOutputName(extension.getOutputName());
-                    task.setGraalVersion(extension.getGraalVersion());
-                    task.setJarFile(jar.map(j -> j.getOutputs().getFiles().getSingleFile()));
-                    task.setClasspath(project.getConfigurations().named("runtimeClasspath"));
-                    task.setCacheDir(cacheDir);
-                    task.setOptions(extension.getOptions());
-                    task.dependsOn(extractGraal);
-                    task.dependsOn(jar);
-                });
+        project.getTasks().register("nativeImage", NativeImageTask.class, task -> {
+            task.setMainClass(extension.getMainClass());
+            task.setOutputName(extension.getOutputName());
+            task.setGraalVersion(extension.getGraalVersion());
+            task.setJarFile(jar.map(j -> j.getOutputs().getFiles().getSingleFile()));
+            task.setClasspath(project.getConfigurations().named("runtimeClasspath"));
+            task.setCacheDir(cacheDir);
+            task.setOptions(extension.getOptions());
+            task.dependsOn(extractGraal);
+            task.dependsOn(jar);
+        });
 
         TaskProvider<Jar> sharedLibrary = project.getTasks().withType(Jar.class).named("jar");
-        project.getTasks().register(
-                "sharedLibrary",
-                SharedLibraryTask.class,
-                task -> {
-                    task.setOutputName(extension.getOutputName());
-                    task.setGraalVersion(extension.getGraalVersion());
-                    task.setJarFile(sharedLibrary.map(j -> j.getOutputs().getFiles().getSingleFile()));
-                    task.setClasspath(project.getConfigurations().named("runtimeClasspath"));
-                    task.setCacheDir(cacheDir);
-                    task.setOptions(extension.getOptions());
-                    task.dependsOn(extractGraal);
-                    task.dependsOn(sharedLibrary);
-                });
+        project.getTasks().register("sharedLibrary", SharedLibraryTask.class, task -> {
+            task.setOutputName(extension.getOutputName());
+            task.setGraalVersion(extension.getGraalVersion());
+            task.setJarFile(sharedLibrary.map(j -> j.getOutputs().getFiles().getSingleFile()));
+            task.setClasspath(project.getConfigurations().named("runtimeClasspath"));
+            task.setCacheDir(cacheDir);
+            task.setOptions(extension.getOptions());
+            task.dependsOn(extractGraal);
+            task.dependsOn(sharedLibrary);
+        });
     }
 }
